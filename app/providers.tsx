@@ -2,12 +2,12 @@
 
 import React from "react";
 import { ThemeProvider } from "./ThemeProvider";
-import { Toast } from "@/components/ui/toast";
+import { Toaster } from "@/components/ui/toaster";
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   return (
     <>
-      <Toast />
+      <Toaster />
       <ThemeProvider
         attribute="class"
         defaultTheme="system"
