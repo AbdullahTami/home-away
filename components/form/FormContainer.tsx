@@ -1,3 +1,4 @@
+"use client";
 import React, { PropsWithChildren, useEffect } from "react";
 import { useFormState } from "react-dom";
 import { useToast } from "../ui/use-toast";
