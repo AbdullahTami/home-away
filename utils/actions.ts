@@ -1,12 +1,15 @@
 "use server";
 
 import { clerkClient, currentUser } from "@clerk/nextjs/server";
-import { profileSchema } from "./schemas";
+import { imageSchema, profileSchema, validateWithZodSchema } from "./schemas";
 import prisma from "./db";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { error } from "console";
+import { AnyMxRecord } from "dns";
+import { uploadImage } from "./supabase";
 
+//! Guard Function
 async function getAuthUser() {
   const user = await currentUser();
   if (!user) throw new Error("You must be logged in to access this route");
@@ -22,6 +25,7 @@ function renderError(error: unknown): { message: string } {
   };
 }
 
+//! Profile Creation Action
 export async function createProfileAction(prevState: any, formData: FormData) {
   try {
     const user = await currentUser();
@@ -29,7 +33,7 @@ export async function createProfileAction(prevState: any, formData: FormData) {
     console.log(user);
 
     const rawData = Object.fromEntries(formData);
-    const validatedFields = profileSchema.parse(rawData);
+    const validatedFields = validateWithZodSchema(profileSchema, rawData);
     await prisma.profile.create({
       data: {
         clerkId: user.id,
@@ -50,6 +54,7 @@ export async function createProfileAction(prevState: any, formData: FormData) {
   redirect("/");
 }
 
+//! Image Fetching
 export async function fetchProfileImage() {
   const user = await currentUser();
   if (!user) return null;
@@ -77,6 +82,7 @@ export async function fetchProfile() {
   return profile;
 }
 
+//! Profile Update
 export async function updateProfileAction(
   prevState: any,
   formData: FormData
@@ -85,23 +91,43 @@ export async function updateProfileAction(
 
   try {
     const rawData = Object.fromEntries(formData);
-    const validatedFields = profileSchema.safeParse(rawData);
-    console.log(validatedFields);
+    const validatedFields = validateWithZodSchema(profileSchema, rawData);
+    await prisma.profile.update({
+      where: {
+        clerkId: user.id,
+      },
+      data: validatedFields,
+    });
 
-    if (!validatedFields.success) {
-      const errors = validatedFields.error.issues.map((error) => error.message);
-      throw new Error(errors.join(","));
-    }
+    revalidatePath("/profile");
+    return { message: "Profile updated successfully" };
+  } catch (error) {
+    return renderError(error);
+  }
+}
+
+//! Profile Image Update
+export async function updateProfileImageAction(
+  prevState: any,
+  formData: FormData
+): Promise<{ message: string }> {
+  const user = await getAuthUser();
+
+  try {
+    const image = formData.get("image") as string;
+    const validatedFields = validateWithZodSchema(imageSchema, { image });
+    const fullPath = await uploadImage(validatedFields.image);
 
     await prisma.profile.update({
       where: {
         clerkId: user.id,
       },
-      data: validatedFields.data,
+      data: {
+        profileImage: fullPath,
+      },
     });
-
     revalidatePath("/profile");
-    return { message: "Profile updated successfully" };
+    return { message: "Profile image updated successfully" };
   } catch (error) {
     return renderError(error);
   }
