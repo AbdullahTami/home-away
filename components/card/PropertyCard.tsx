@@ -3,6 +3,9 @@ import { PropertyCardProps } from "@/utils/types";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
+import PropertyRating from "./PropertyRating";
+import FavoriteToggleButton from "./FavoriteToggleButton";
+import CountryFlagAndName from "./CountryFlagAndName";
 
 export default function PropertyCard({
   property,
@@ -28,6 +31,7 @@ export default function PropertyCard({
             {name.substring(0, 30)}
           </h3>
           {/* property rating */}
+          <PropertyRating inPage={false} propertyId={propertyId} />
         </div>
         <p className="text-sm mt-1 text-muted-foreground">
           {tagline.substring(0, 40)}
@@ -37,10 +41,11 @@ export default function PropertyCard({
             <span className="font-semibold">{formatCurrency(price)}</span> night
           </p>
           {/* country and flag */}
+          <CountryFlagAndName countryCode={country} />
         </div>
       </Link>
       <div className="absolute top-5 right-5 z-5">
-        {/* favorite toggle button */}
+        <FavoriteToggleButton propertyId={propertyId} />
       </div>
     </article>
   );
