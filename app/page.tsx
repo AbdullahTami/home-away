@@ -1,13 +1,23 @@
+import CategoriesList from "@/components/home/CategoriesList";
+import PropertiesContainer from "@/components/home/PropertiesContainer";
 import { Button } from "@/components/ui/button";
 import React from "react";
 
-export default function HomePage() {
+export default function HomePage({
+  searchParams,
+}: {
+  searchParams: { category?: string; search?: string };
+}) {
   return (
-    <div>
-      <h3 className="text-3xl">Home page</h3>
-      <Button variant="outline" size="lg" className="capitalize m-8">
-        Button works!
-      </Button>
-    </div>
+    <section>
+      <CategoriesList
+        category={searchParams.category}
+        search={searchParams.search}
+      />
+      <PropertiesContainer
+        category={searchParams.category}
+        search={searchParams.search}
+      />
+    </section>
   );
 }

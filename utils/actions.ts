@@ -147,10 +147,52 @@ export async function createPropertyAction(
 
   try {
     const rawData = Object.fromEntries(formData);
+    const file = formData.get("image") as File;
     const validatedFields = validateWithZodSchema(propertySchema, rawData);
-    return { message: "Property created" };
+    const validatedFile = validateWithZodSchema(imageSchema, { image: file });
+    const fullPath = await uploadImage(validatedFile.image);
+
+    await prisma.property.create({
+      data: {
+        ...validatedFields,
+        image: fullPath,
+        profileId: user.id,
+      },
+    });
   } catch (error) {
     return renderError(error);
   }
   redirect("/");
+}
+
+//! Properties fetching
+export async function fetchProperties({
+  search = "",
+  category,
+}: {
+  search?: string;
+  category?: string;
+}) {
+  const properties = await prisma.property.findMany({
+    where: {
+      // If not defined, all categories are fetched
+      category,
+      OR: [
+        { name: { contains: search, mode: "insensitive" } },
+        { tagline: { contains: search, mode: "insensitive" } },
+      ],
+    },
+    select: {
+      id: true,
+      name: true,
+      tagline: true,
+      country: true,
+      price: true,
+      image: true,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+  return properties;
 }

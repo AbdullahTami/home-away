@@ -35,7 +35,7 @@ model Property {
   description String
   tagline String
   price Int
-  guest Int
+  guests Int
   beds Int
   baths Int
   bedrooms Int
