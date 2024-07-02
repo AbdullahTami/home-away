@@ -3,6 +3,8 @@ import { Button } from "../ui/button";
 import { FaHeart } from "react-icons/fa";
 import { auth } from "@clerk/nextjs/server";
 import { CardSignInButton } from "../form/Buttons";
+import { fetchFavoritesId } from "@/utils/actions";
+import FavoriteToggleForm from "./FavoriteToggleForm";
 
 export default async function FavoriteToggleButton({
   propertyId,
@@ -11,9 +13,6 @@ export default async function FavoriteToggleButton({
 }) {
   const { userId } = auth();
   if (!userId) return <CardSignInButton />;
-  return (
-    <Button size="icon" variant="outline" className="p-2 cursor-pointer">
-      <FaHeart />
-    </Button>
-  );
+  const favoriteId = await fetchFavoritesId({ propertyId });
+  return <FavoriteToggleForm favoriteId={favoriteId} propertyId={propertyId} />;
 }
