@@ -241,3 +241,38 @@ export async function toggleFavoriteAction(prevState: {
     renderError(error);
   }
 }
+
+//! Fetching favorites
+export async function fetchFavorites() {
+  const user = await getAuthUser();
+  const favorites = await prisma.favorite.findMany({
+    where: {
+      profileId: user.id,
+    },
+    select: {
+      property: {
+        select: {
+          id: true,
+          name: true,
+          tagline: true,
+          country: true,
+          price: true,
+          image: true,
+        },
+      },
+    },
+  });
+  return favorites.map((favorite) => favorite.property);
+}
+
+//! Fetching property details
+export async function fetchPropertyDetails(id: string) {
+  return prisma.property.findUnique({
+    where: {
+      id,
+    },
+    include: {
+      profile: true,
+    },
+  });
+}
