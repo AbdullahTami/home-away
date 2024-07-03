@@ -1,4 +1,4 @@
-import { findCountyByCode } from "@/utils/countries";
+import { findCountryByCode } from "@/utils/countries";
 import React from "react";
 
 export default function CountryFlagAndName({
@@ -6,7 +6,7 @@ export default function CountryFlagAndName({
 }: {
   countryCode: string;
 }) {
-  const validCountry = findCountyByCode(countryCode)!;
+  const validCountry = findCountryByCode(countryCode)!;
 
   const countryName =
     validCountry.name.length > 20

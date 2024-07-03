@@ -10,6 +10,6 @@ export const formattedCountries = countries.map((item) => {
   };
 });
 
-export function findCountyByCode(code: string) {
+export function findCountryByCode(code: string) {
   return formattedCountries.find((item) => item.code === code);
 }
