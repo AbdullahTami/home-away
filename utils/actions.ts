@@ -276,3 +276,8 @@ export async function fetchPropertyDetails(id: string) {
     },
   });
 }
+
+//! Create review action
+export const createReviewAction = async () => {
+  return { message: "create review" };
+};
