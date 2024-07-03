@@ -24,7 +24,7 @@ export default function RatingInput({
       <Label htmlFor={name} className="capitalize">
         {labelText || name}
       </Label>
-      <Select defaultValue={numbers[5]} name={name} required>
+      <Select defaultValue={numbers[0]} name={name} required>
         <SelectTrigger>
           <SelectValue />
         </SelectTrigger>

@@ -2,6 +2,7 @@
 
 import { clerkClient, currentUser } from "@clerk/nextjs/server";
 import {
+  createReviewSchema,
   imageSchema,
   profileSchema,
   propertySchema,
@@ -278,6 +279,20 @@ export async function fetchPropertyDetails(id: string) {
 }
 
 //! Create review action
-export const createReviewAction = async () => {
-  return { message: "create review" };
-};
+export async function createReviewAction(prevState: any, formData: FormData) {
+  try {
+    const user = await getAuthUser();
+    const rawData = Object.fromEntries(formData);
+    const validatedFields = validateWithZodSchema(createReviewSchema, rawData);
+    await prisma.review.create({
+      data: {
+        profileId: user.id,
+        ...validatedFields,
+      },
+    });
+    revalidatePath(`/properties/${validatedFields.propertyId}`);
+    return { message: "Review submitted successfully" };
+  } catch (error) {
+    renderError(error);
+  }
+}
