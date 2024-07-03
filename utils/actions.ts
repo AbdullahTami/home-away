@@ -296,3 +296,26 @@ export async function createReviewAction(prevState: any, formData: FormData) {
     renderError(error);
   }
 }
+//! Fetch single property reviews
+export async function fetchPropertyReviews(propertyId: string) {
+  const reviews = prisma.review.findMany({
+    where: {
+      propertyId,
+    },
+    select: {
+      id: true,
+      rating: true,
+      comment: true,
+      profile: {
+        select: {
+          firstName: true,
+          profileImage: true,
+        },
+      },
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+  return reviews;
+}

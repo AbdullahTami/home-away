@@ -15,6 +15,7 @@ import { redirect } from "next/navigation";
 import dynamic from "next/dynamic";
 import { Skeleton } from "@/components/ui/skeleton";
 import SubmitReview from "@/components/reviews/SubmitReview";
+import PropertyReviews from "@/components/reviews/PropertyReviews";
 const DynamicMap = dynamic(
   () => import("@/components/properties/PropertyMap"),
   {
@@ -65,6 +66,7 @@ export default async function PropertyDetailsPage({
         </div>
       </section>
       <SubmitReview propertyId={property.id} />
+      <PropertyReviews propertyId={property.id} />
     </section>
   );
 }
