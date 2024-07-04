@@ -9,7 +9,6 @@ type PropertyDetailsProps = {
     beds: number;
   };
 };
-
 export default function PropertyDetails({
   details: { baths, beds, bedrooms, guests },
 }: PropertyDetailsProps) {
