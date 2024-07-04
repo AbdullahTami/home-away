@@ -319,3 +319,38 @@ export async function fetchPropertyReviews(propertyId: string) {
   });
   return reviews;
 }
+//! Fetch single property reviews by user
+export async function fetchPropertyReviewsByUser() {
+  const user = await getAuthUser();
+  const reviews = await prisma.review.findMany({
+    where: {
+      profileId: user.id,
+    },
+    select: {
+      id: true,
+      rating: true,
+      comment: true,
+      property: {
+        select: {
+          name: true,
+          image: true,
+        },
+      },
+    },
+  });
+  return reviews;
+}
+//! Delete review action
+export async function deleteReviewAction(prevState: { reviewId: string }) {
+  const { reviewId } = prevState;
+  const user = await getAuthUser();
+  try {
+    await prisma.review.delete({
+      where: { id: reviewId, profileId: user.id },
+    });
+    revalidatePath("/reviews");
+    return { message: "Review deleted successfully" };
+  } catch (error) {
+    renderError(error);
+  }
+}
