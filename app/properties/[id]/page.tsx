@@ -2,7 +2,7 @@ import React from "react";
 import FavoriteToggleButton from "@/components/card/FavoriteToggleButton";
 import PropertyRating from "@/components/card/PropertyRating";
 import Amenities from "@/components/properties/Amenities";
-import BookingCalender from "@/components/properties/BookingCalender";
+
 import BreadCrumbs from "@/components/properties/BreadCrumbs";
 import Description from "@/components/properties/Description";
 import ImageContainer from "@/components/properties/ImageContainer";
@@ -25,6 +25,11 @@ const DynamicMap = dynamic(
   }
 );
 
+const DynamicBookingWrapper = dynamic(
+  () => import("@/components/booking/BookingWrapper"),
+  { ssr: false, loading: () => <Skeleton className="h-[200px] w-full" /> }
+);
+
 export default async function PropertyDetailsPage({
   params,
 }: {
@@ -41,6 +46,7 @@ export default async function PropertyDetailsPage({
   const isNotOwner = property.profile.clerkId !== userId;
   const reviewDoesNotExist =
     userId && isNotOwner && !(await findExistingReview(userId, property.id));
+
   return (
     <section>
       <BreadCrumbs name={property.name} />
@@ -67,7 +73,11 @@ export default async function PropertyDetailsPage({
         </div>
         <div className="lg:col-span-4 flex flex-col items-center">
           {/* calender */}
-          <BookingCalender />
+          <DynamicBookingWrapper
+            propertyId={property.id}
+            price={property.price}
+            bookings={property.bookings}
+          />
         </div>
       </section>
       {reviewDoesNotExist && <SubmitReview propertyId={property.id} />}

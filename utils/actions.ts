@@ -274,6 +274,12 @@ export async function fetchPropertyDetails(id: string) {
     },
     include: {
       profile: true,
+      bookings: {
+        select: {
+          checkIn: true,
+          checkOut: true,
+        },
+      },
     },
   });
 }
@@ -369,7 +375,7 @@ export async function fetchPropertyRating(propertyId: string) {
       propertyId,
     },
   });
-  console.log(result);
+  // console.log(result);
 
   return {
     rating: result[0]?._avg.rating?.toFixed() ?? 0,
