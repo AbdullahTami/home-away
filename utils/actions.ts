@@ -424,9 +424,49 @@ export async function createBookingAction(prevState: {
         propertyId,
       },
     });
-    return { message: "create booking" };
   } catch (error) {
     renderError(error);
   }
   redirect("/bookings");
+}
+
+export async function fetchBookings() {
+  const user = await getAuthUser();
+  const bookings = await prisma.booking.findMany({
+    where: {
+      profileId: user.id,
+    },
+    include: {
+      property: {
+        select: {
+          id: true,
+          name: true,
+          country: true,
+        },
+      },
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+  return bookings;
+}
+
+export async function deleteBookingAction(prevState: { bookingId: string }) {
+  const { bookingId } = prevState;
+
+  const user = await getAuthUser();
+
+  try {
+    const result = await prisma.booking.delete({
+      where: {
+        id: bookingId,
+        profileId: user.id,
+      },
+    });
+    revalidatePath("/bookings");
+    return { message: "Booking deleted successfully" };
+  } catch (error) {
+    return renderError(error);
+  }
 }
