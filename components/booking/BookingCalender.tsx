@@ -17,12 +17,25 @@ export default function BookingCalender() {
   const currentDate = new Date();
   const [range, setRange] = useState<DateRange | undefined>(defaultSelected);
   const bookings = useProperty((state) => state.bookings);
+  const { toast } = useToast();
 
   const blockedBookings = generateBlockedPeriods({
     bookings,
     today: currentDate,
   });
+
+  const unavailableDates = generateDisabledDates(blockedBookings);
+
   useEffect(() => {
+    const selectedRange = generateDateRange(range);
+    const isDisabledDateIncluded = selectedRange.some((date) => {
+      if (unavailableDates[date]) {
+        setRange(defaultSelected);
+        toast({ description: "Some dates are booked. Please select again" });
+        return true;
+      }
+      return false;
+    });
     useProperty.setState({ range });
   }, [range]);
   return (
