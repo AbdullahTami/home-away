@@ -13,5 +13,5 @@ export function calculateTotals({ checkIn, checkOut, price }: BookingDetails) {
   const service = 40;
   const tax = subTotal * 0.15;
   const orderTotal = subTotal + cleaning + service + tax;
-  return { service, subTotal, cleaning, tax, orderTotal };
+  return { service, subTotal, cleaning, tax, orderTotal ,totalNights};
 }

@@ -11,9 +11,8 @@ import {
 import prisma from "./db";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { error } from "console";
-import { AnyMxRecord } from "dns";
 import { uploadImage } from "./supabase";
+import { calculateTotals } from "./calculateTotals";
 
 //! Guard Function
 async function getAuthUser() {
@@ -391,4 +390,43 @@ export async function findExistingReview(userId: string, propertyId: string) {
       propertyId: propertyId,
     },
   });
+}
+
+//! Booking creation action
+export async function createBookingAction(prevState: {
+  propertyId: string;
+  checkIn: Date;
+  checkOut: Date;
+}) {
+  const user = await getAuthUser();
+  const { propertyId, checkIn, checkOut } = prevState;
+  const property = await prisma.property.findUnique({
+    where: {
+      id: propertyId,
+    },
+    select: { price: true },
+  });
+  if (!property) return { message: "Property not found" };
+
+  const { orderTotal, totalNights } = calculateTotals({
+    checkIn,
+    checkOut,
+    price: property?.price,
+  });
+  try {
+    const booking = await prisma.booking.create({
+      data: {
+        checkIn,
+        checkOut,
+        orderTotal,
+        totalNights,
+        profileId: user.id,
+        propertyId,
+      },
+    });
+    return { message: "create booking" };
+  } catch (error) {
+    renderError(error);
+  }
+  redirect("/bookings");
 }
