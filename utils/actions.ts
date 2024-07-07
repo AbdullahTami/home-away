@@ -533,3 +533,18 @@ export async function deleteRentalAction(prevState: { propertyId: string }) {
     return renderError(error);
   }
 }
+//! Rental details fetch action
+export async function fetchRentalDetails(propertyId: string) {
+  const user = await getAuthUser();
+  return prisma.property.findUnique({
+    where: { id: propertyId, profileId: user.id },
+  });
+}
+//! Property update action
+export async function updatePropertyAction() {
+  return { message: "update property action" };
+}
+//! Property image update action
+export async function updatePropertyImageAction() {
+  return { message: "update property image" };
+}
