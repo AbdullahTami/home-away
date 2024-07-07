@@ -594,3 +594,24 @@ export async function updatePropertyImageAction(
     return renderError(error);
   }
 }
+
+export async function fetchReservations() {
+  const user = await getAuthUser();
+
+  const reservations = await prisma.booking.findMany({
+    where: {
+      property: {
+        profileId: user.id,
+      },
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+    include: {
+      property: {
+        select: { id: true, name: true, price: true, country: true },
+      },
+    },
+  });
+  return reservations;
+}
