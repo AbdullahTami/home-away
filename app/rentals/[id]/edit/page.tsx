@@ -23,7 +23,9 @@ export default async function EditRentalPage({
   params: { id: string };
 }) {
   const property = await fetchRentalDetails(params.id);
+
   if (!property) redirect("/");
+  const defaultAmenities: Amenity[] = JSON.parse(property.amenities);
   return (
     <section>
       <h1 className="text-2xl font-semibold mb-8 capitalize">Edit Property</h1>
@@ -67,6 +69,8 @@ export default async function EditRentalPage({
           <CounterInput detail="bedrooms" defaultValue={property.bedrooms} />
           <CounterInput detail="beds" defaultValue={property.beds} />
           <CounterInput detail="baths" defaultValue={property.baths} />
+          <h3 className="text-lg mt-10 mb-6 font-medium">Amenities</h3>
+          <AmenitiesInput defaultValue={defaultAmenities} />
           <SubmitButton text="edit property" className="mt-12" />
         </FormContainer>
       </div>

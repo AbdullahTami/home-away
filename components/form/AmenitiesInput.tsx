@@ -9,8 +9,15 @@ export default function AmenitiesInput({
 }: {
   defaultValue?: Amenity[];
 }) {
+  const amenitiesWithIcons = defaultValue?.map(({ name, selected }) => {
+    return {
+      name,
+      selected,
+      icon: amenities.find((amenity) => amenity.name === name)!.icon,
+    };
+  });
   const [selectedAmenities, setSelectedAmenities] = useState<Amenity[]>(
-    defaultValue || amenities
+    amenitiesWithIcons || amenities
   );
   function handleChange(amenity: Amenity) {
     setSelectedAmenities((prev) => {
