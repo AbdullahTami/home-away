@@ -541,10 +541,56 @@ export async function fetchRentalDetails(propertyId: string) {
   });
 }
 //! Property update action
-export async function updatePropertyAction() {
-  return { message: "update property action" };
+export async function updatePropertyAction(
+  prevState: any,
+  formData: FormData
+): Promise<{ message: string }> {
+  const user = await getAuthUser();
+  const propertyId = formData.get("id") as string;
+  try {
+    const rawData = Object.fromEntries(formData);
+    const validatedFields = validateWithZodSchema(propertySchema, rawData);
+    // await prisma.property.update({
+    //   where: { id: propertyId, profileId: user.id },
+    // });
+    await prisma.property.update({
+      where: {
+        id: propertyId,
+        profileId: user.id,
+      },
+      data: {
+        ...validatedFields,
+      },
+    });
+    revalidatePath(`/rentals/${propertyId}/edit`);
+    return { message: "Update Successful" };
+  } catch (error) {
+    return renderError(error);
+  }
 }
 //! Property image update action
-export async function updatePropertyImageAction() {
-  return { message: "update property image" };
+export async function updatePropertyImageAction(
+  prevState: any,
+  formData: FormData
+): Promise<{ message: string }> {
+  const user = await getAuthUser();
+  const propertyId = formData.get("id") as string;
+  try {
+    const image = formData.get("image") as File;
+    const validatedFields = validateWithZodSchema(imageSchema, { image });
+    const fullPath = await uploadImage(validatedFields.image);
+    await prisma.property.update({
+      where: {
+        id: propertyId,
+        profileId: user.id,
+      },
+      data: {
+        image: fullPath,
+      },
+    });
+    revalidatePath(`/rentals/${propertyId}/edit`);
+    return { message: "Property Image Updated Successfully" };
+  } catch (error) {
+    return renderError(error);
+  }
 }
