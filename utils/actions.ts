@@ -430,6 +430,7 @@ export async function createBookingAction(prevState: {
   redirect("/bookings");
 }
 
+//! Booking fetching action
 export async function fetchBookings() {
   const user = await getAuthUser();
   const bookings = await prisma.booking.findMany({
@@ -452,6 +453,7 @@ export async function fetchBookings() {
   return bookings;
 }
 
+//! Booking deletion action
 export async function deleteBookingAction(prevState: { bookingId: string }) {
   const { bookingId } = prevState;
 
@@ -466,6 +468,67 @@ export async function deleteBookingAction(prevState: { bookingId: string }) {
     });
     revalidatePath("/bookings");
     return { message: "Booking deleted successfully" };
+  } catch (error) {
+    return renderError(error);
+  }
+}
+
+//! Rentals fetching
+export async function fetchRentals() {
+  const user = await getAuthUser();
+  const rentals = await prisma.property.findMany({
+    where: {
+      profileId: user.id,
+    },
+    select: {
+      id: true,
+      name: true,
+      price: true,
+    },
+  });
+
+  const totalNightSum = await Promise.all(
+    rentals.map(async (rental) => {
+      const totalNightSum = await prisma.booking.aggregate({
+        where: {
+          propertyId: rental.id,
+        },
+        _sum: {
+          totalNights: true,
+        },
+      });
+      const orderTotalSum = await prisma.booking.aggregate({
+        where: {
+          propertyId: rental.id,
+        },
+        _sum: {
+          orderTotal: true,
+        },
+      });
+      return {
+        ...rental,
+        totalNightsSum: totalNightSum._sum.totalNights,
+        orderTotalSum: orderTotalSum._sum.orderTotal,
+      };
+    })
+  );
+  return totalNightSum;
+}
+
+//! Rental deletion action
+export async function deleteRentalAction(prevState: { propertyId: string }) {
+  const { propertyId } = prevState;
+  const user = await getAuthUser();
+
+  try {
+    await prisma.property.delete({
+      where: {
+        id: propertyId,
+        profileId: user.id,
+      },
+    });
+    revalidatePath("/rentals");
+    return { message: "Rental deleted successfully" };
   } catch (error) {
     return renderError(error);
   }
