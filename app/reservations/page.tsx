@@ -23,16 +23,18 @@ export default async function ReservationsPage() {
       <h4 className="mb-4 capitalize">
         total reservations : {reservations.length}
       </h4>
-      <TableCaption>A list of your recent reservations</TableCaption>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Property Name</TableHead>
-          <TableHead>Country</TableHead>
-          <TableHead>Nights</TableHead>
-          <TableHead>Total</TableHead>
-          <TableHead>Check In</TableHead>
-          <TableHead>Check Out</TableHead>
-        </TableRow>
+      <Table>
+        <TableCaption>A list of your recent reservations</TableCaption>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Property Name</TableHead>
+            <TableHead>Country</TableHead>
+            <TableHead>Nights</TableHead>
+            <TableHead>Total</TableHead>
+            <TableHead>Check In</TableHead>
+            <TableHead>Check Out</TableHead>
+          </TableRow>
+        </TableHeader>
         <TableBody>
           {reservations.map((item) => {
             const { id, totalNights, orderTotal, checkIn, checkOut } = item;
@@ -61,7 +63,7 @@ export default async function ReservationsPage() {
             );
           })}
         </TableBody>
-      </TableHeader>
+      </Table>
     </div>
   );
 }
