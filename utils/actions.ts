@@ -14,11 +14,18 @@ import { revalidatePath } from "next/cache";
 import { uploadImage } from "./supabase";
 import { calculateTotals } from "./calculateTotals";
 
-//! Guard Function
+//! Auth Guard Function
 async function getAuthUser() {
   const user = await currentUser();
   if (!user) throw new Error("You must be logged in to access this route");
   if (!user.privateMetadata.hasProfile) redirect("/profile/create");
+  return user;
+}
+
+//! Admin Guard Function
+async function getAdminUser() {
+  const user = await getAuthUser();
+  if (user.id !== process.env.ADMIN_USER_ID) redirect("/");
   return user;
 }
 
@@ -614,4 +621,14 @@ export async function fetchReservations() {
     },
   });
   return reservations;
+}
+
+export async function fetchStats() {
+  await getAdminUser();
+
+  const usersCount = await prisma.profile.count();
+  const propertiesCount = await prisma.property.count();
+  const bookingsCount = await prisma.booking.count();
+
+  return { usersCount, propertiesCount, bookingsCount };
 }
