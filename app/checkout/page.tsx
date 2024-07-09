@@ -24,7 +24,7 @@ export default function CheckoutPage() {
   const options = { fetchClientSecret };
   return (
     <EmbeddedCheckoutProvider stripe={stripePromise} options={options}>
-      checkoutPage
+      <EmbeddedCheckout />
     </EmbeddedCheckoutProvider>
   );
 }
