@@ -407,6 +407,7 @@ export async function createBookingAction(prevState: {
   checkOut: Date;
 }) {
   const user = await getAuthUser();
+  let bookingId: null | string = null;
   const { propertyId, checkIn, checkOut } = prevState;
   const property = await prisma.property.findUnique({
     where: {
@@ -432,10 +433,12 @@ export async function createBookingAction(prevState: {
         propertyId,
       },
     });
+    bookingId = booking.id;
   } catch (error) {
     renderError(error);
   }
-  redirect("/bookings");
+
+  redirect(`/checkout?bookingId=${bookingId}`);
 }
 
 //! Booking fetching action
