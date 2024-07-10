@@ -433,6 +433,7 @@ export async function createBookingAction(prevState: {
         propertyId,
       },
     });
+
     bookingId = booking.id;
   } catch (error) {
     renderError(error);
