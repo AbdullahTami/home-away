@@ -407,6 +407,12 @@ export async function createBookingAction(prevState: {
   checkOut: Date;
 }) {
   const user = await getAuthUser();
+  await prisma.booking.deleteMany({
+    where: {
+      profileId: user.id,
+      paymentStatus: false,
+    },
+  });
   let bookingId: null | string = null;
   const { propertyId, checkIn, checkOut } = prevState;
   const property = await prisma.property.findUnique({
@@ -448,6 +454,7 @@ export async function fetchBookings() {
   const bookings = await prisma.booking.findMany({
     where: {
       profileId: user.id,
+      paymentStatus: true,
     },
     include: {
       property: {
@@ -499,11 +506,12 @@ export async function fetchRentals() {
     },
   });
 
-  const totalNightSum = await Promise.all(
+  const rentalsWithBookingSums = await Promise.all(
     rentals.map(async (rental) => {
       const totalNightSum = await prisma.booking.aggregate({
         where: {
           propertyId: rental.id,
+          paymentStatus: true,
         },
         _sum: {
           totalNights: true,
@@ -512,6 +520,7 @@ export async function fetchRentals() {
       const orderTotalSum = await prisma.booking.aggregate({
         where: {
           propertyId: rental.id,
+          paymentStatus: true,
         },
         _sum: {
           orderTotal: true,
@@ -524,7 +533,7 @@ export async function fetchRentals() {
       };
     })
   );
-  return totalNightSum;
+  return rentalsWithBookingSums;
 }
 
 //! Rental deletion action
@@ -612,6 +621,7 @@ export async function fetchReservations() {
 
   const reservations = await prisma.booking.findMany({
     where: {
+      paymentStatus: true,
       property: {
         profileId: user.id,
       },
@@ -633,7 +643,9 @@ export async function fetchStats() {
 
   const usersCount = await prisma.profile.count();
   const propertiesCount = await prisma.property.count();
-  const bookingsCount = await prisma.booking.count();
+  const bookingsCount = await prisma.booking.count({
+    where: { paymentStatus: true },
+  });
 
   return { usersCount, propertiesCount, bookingsCount };
 }
@@ -646,6 +658,7 @@ export async function fetchChartsData() {
 
   const bookings = await prisma.booking.findMany({
     where: {
+      paymentStatus: true,
       createdAt: {
         gte: sixMonthsAgo,
       },
