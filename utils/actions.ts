@@ -680,3 +680,30 @@ export async function fetchChartsData() {
   }, [] as Array<{ date: string; count: number }>);
   return bookingsPerMonth;
 }
+
+export async function fetchReservationStats() {
+  const user = await getAuthUser();
+
+  const properties = await prisma.property.count({
+    where: {
+      profileId: user.id,
+    },
+  });
+
+  const total = await prisma.booking.aggregate({
+    _sum: {
+      orderTotal: true,
+      totalNights: true,
+    },
+    where: {
+      property: {
+        profileId: user.id,
+      },
+    },
+  });
+  return {
+    properties,
+    nights: total._sum.totalNights || 0,
+    amount: total._sum.orderTotal || 0,
+  };
+}

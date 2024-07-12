@@ -6,7 +6,7 @@ export default function StatsCard({
   value,
 }: {
   title: string;
-  value: number;
+  value: number | string;
 }) {
   return (
     <Card className="bg-muted">
