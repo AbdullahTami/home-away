@@ -15,6 +15,10 @@ b) Get API Keys and store them in your .env. use the docs which will provide an 
 a) Obtain API keys.
 b) Store them in your .env file
 
+### 3- Set up a Stripe project:
+a) Obtain API keys.
+b) Store them in your .env file
+
 # Quick Start
 After configuring your aforementioned correctly use this command to run the project:
 ```bash
